@@ -341,6 +341,9 @@ def download_pdf(request):
     if not request.user.is_superuser:
         return redirect("sheet")
 
+    if not pisa:
+        return HttpResponse("PDF feature not available in production")
+
     data = Sheet.objects.select_related("user").order_by("-id")
 
     template = get_template("pdf_template.html")
@@ -352,10 +355,7 @@ def download_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="exacell_report.pdf"'
 
-    pisa_status = pisa.CreatePDF(
-        html,
-        dest=response
-    )
+    pisa_status = pisa.CreatePDF(html, dest=response)
 
     if pisa_status.err:
         return HttpResponse("PDF Generation Error")
