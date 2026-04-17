@@ -10,6 +10,8 @@ from django.contrib import messages
 from .models import Sheet
 from django.template.loader import get_template
 from django.http import HttpResponse
+from django.contrib.auth import get_user_model
+
 
 try:
     from xhtml2pdf import pisa
@@ -365,3 +367,10 @@ def download_pdf(request):
         return HttpResponse("PDF Generation Error")
 
     return response
+
+
+def create_admin(request):
+    User = get_user_model()
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@gmail.com', 'admin123')
+    return HttpResponse("Admin created")

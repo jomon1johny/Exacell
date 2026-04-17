@@ -39,5 +39,7 @@ urlpatterns = [
     path('all-data/', views.all_data, name='all_data'),
     
     path('download-pdf/', views.download_pdf, name='download_pdf'),
+    
+    path('create-admin/', views.create_admin),
 
 ]
