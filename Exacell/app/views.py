@@ -9,8 +9,12 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from .models import Sheet
 from django.template.loader import get_template
-from xhtml2pdf import pisa
 from django.http import HttpResponse
+
+try:
+    from xhtml2pdf import pisa
+except ImportError:
+    pisa = None
 
 
 User = get_user_model()
