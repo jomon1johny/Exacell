@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+body{
+font-family:Arial;
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:8px;
+}
+
+th,td{
+border:1px solid black;
+padding:5px;
+text-align:center;
+}
+
+th{
+background:#27ae60;
+color:white;
+}
+
+</style>
+</head>
+<body>
+
+<h2>Exacell Data Report</h2>
+
+<table>
+
+<tr>
+<th>SL</th>
+<th>GEM</th>
+<th>Date</th>
+<th>Place</th>
+<th>Officer</th>
+<th>Contact</th>
+<th>Marketing</th>
+<th>Item</th>
+<th>Rate</th>
+<th>GST</th>
+<th>Company</th>
+<th>Bill</th>
+<th>Bill Date</th>
+<th>Qty</th>
+<th>Price</th>
+<th>Amount</th>
+<th>FR</th>
+<th>FB</th>
+<th>TFR</th>
+<th>Order</th>
+</tr>
+
+{% for row in data %}
+<tr>
+
+<td>{{ forloop.counter }}</td>
+<td>{{ row.gem }}</td>
+<td>{{ row.date }}</td>
+<td>{{ row.place }}</td>
+<td>{{ row.officer }}</td>
+<td>{{ row.contact }}</td>
+<td>{{ row.marketing }}</td>
+<td>{{ row.item }}</td>
+<td>{{ row.rate }}</td>
+<td>{{ row.gst }}</td>
+<td>{{ row.company }}</td>
+<td>{{ row.bill }}</td>
+<td>{{ row.billdate }}</td>
+<td>{{ row.qty }}</td>
+<td>{{ row.price }}</td>
+<td>{{ row.amount }}</td>
+<td>{{ row.fr }}</td>
+<td>{{ row.fb }}</td>
+<td>{{ row.tfr }}</td>
+<td>{{ row.orderby }}</td>
+
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>

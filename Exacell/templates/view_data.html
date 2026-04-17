@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>View Data - Exacell</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#eef7f1;
+padding:25px;
+position:relative;
+overflow-x:hidden;
+}
+
+
+/* WATERMARK */
+
+.watermark{
+position:fixed;
+top:0;
+left:0;
+width:200%;
+height:200%;
+transform:rotate(-45deg);
+z-index:0;
+pointer-events:none;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+.watermark p{
+font-size:60px;
+color:rgba(0,0,0,0.09);
+white-space:nowrap;
+margin:40px 0;
+}
+
+
+/* MAIN CONTENT */
+
+.container{
+max-width:100%;
+margin:auto;
+position:relative;
+z-index:1;
+}
+
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.header h2{
+color:#27ae60;
+font-size:28px;
+}
+
+.user-box{
+background:#fff;
+padding:10px 15px;
+border-radius:8px;
+box-shadow:0 3px 10px rgba(0,0,0,0.08);
+font-weight:bold;
+}
+
+
+.top-actions{
+display:flex;
+justify-content:space-between;
+margin-bottom:20px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+
+
+.back-btn{
+background:#27ae60;
+color:white;
+}
+
+
+.update-btn{
+background:#3498db;
+color:white;
+}
+
+
+.delete-btn{
+background:#e74c3c;
+color:white;
+}
+
+
+.search-box{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.search-box input{
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+width:250px;
+}
+
+
+.table-container{
+overflow:auto;
+background:#fff;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+
+table{
+width:100%;
+min-width:1800px;
+border-collapse:collapse;
+}
+
+
+th{
+background:#27ae60;
+color:white;
+padding:14px;
+position:sticky;
+top:0;
+z-index:2;
+}
+
+
+td{
+padding:12px;
+text-align:center;
+border-bottom:1px solid #eee;
+}
+
+
+tr:hover{
+background:#f4fff8;
+}
+
+
+.action-buttons{
+display:flex;
+justify-content:center;
+gap:8px;
+}
+
+
+.no-data{
+text-align:center;
+padding:30px;
+font-weight:bold;
+color:#777;
+}
+
+</style>
+</head>
+
+<body>
+
+
+<!-- WATERMARK -->
+<div class="watermark">
+
+    {% for i in "12345678901234567890123456789012345678901234567890"|make_list %}
+        <p>
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+        </p>
+    {% endfor %}
+
+</div>
+
+
+<div class="container">
+
+<div class="header">
+
+<h2>Stored Spreadsheet Data</h2>
+
+<div class="user-box">
+Welcome {{ request.user.username }}
+</div>
+
+</div>
+
+
+<div class="top-actions">
+
+<a href="/">
+<button class="back-btn">← Back to Sheet</button>
+</a>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search all fields...">
+</div>
+
+</div>
+
+
+<div class="table-container">
+
+<table id="dataTable">
+
+<tr>
+<th>SL</th>
+<th>GEM</th>
+<th>Date</th>
+<th>Place</th>
+<th>Officer</th>
+<th>Contact</th>
+<th>Marketing</th>
+<th>Item</th>
+<th>Rate</th>
+<th>GST</th>
+<th>Company</th>
+<th>Bill</th>
+<th>Bill Date</th>
+<th>Qty</th>
+<th>Price</th>
+<th>Amount</th>
+<th>FR</th>
+<th>FB</th>
+<th>TFR</th>
+<th>Order By</th>
+<th>Actions</th>
+</tr>
+
+
+{% for row in data %}
+
+<tr>
+
+<td>{{ forloop.counter }}</td>
+<td>{{ row.gem }}</td>
+<td>{{ row.date }}</td>
+<td>{{ row.place }}</td>
+<td>{{ row.officer }}</td>
+<td>{{ row.contact }}</td>
+<td>{{ row.marketing }}</td>
+<td>{{ row.item }}</td>
+<td>{{ row.rate }}</td>
+<td>{{ row.gst }}</td>
+<td>{{ row.company }}</td>
+<td>{{ row.bill }}</td>
+<td>{{ row.billdate }}</td>
+<td>{{ row.qty }}</td>
+<td>{{ row.price }}</td>
+<td>{{ row.amount }}</td>
+<td>{{ row.fr }}</td>
+<td>{{ row.fb }}</td>
+<td>{{ row.tfr }}</td>
+<td>{{ row.orderby }}</td>
+
+<td>
+
+<div class="action-buttons">
+
+<a href="{% url 'update_data' row.id %}">
+<button class="update-btn">Update</button>
+</a>
+
+<a href="{% url 'delete_data' row.id %}"
+onclick="return confirm('Delete this row?')">
+<button class="delete-btn">Delete</button>
+</a>
+
+</div>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="21" class="no-data">No Data Found</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+
+<script>
+
+document.getElementById("searchInput").addEventListener("keyup",function(){
+
+let filter=this.value.toLowerCase();
+
+let rows=document.querySelectorAll("#dataTable tr");
+
+rows.forEach((row,index)=>{
+
+if(index===0) return;
+
+let text=row.innerText.toLowerCase();
+
+row.style.display=text.includes(filter) ? "" : "none";
+
+});
+
+});
+
+</script>
+
+</body>
+</html>

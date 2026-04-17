@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Exacell Spreadsheet</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#eef7f1;
+    padding:25px;
+}
+
+/* WATERMARK */
+
+.watermark{
+position:fixed;
+top:0;
+left:0;
+width:200%;
+height:200%;
+transform:rotate(-45deg);
+z-index:0;
+pointer-events:none;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+.watermark p{
+font-size:60px;
+color:rgba(0,0,0,0.09);
+white-space:nowrap;
+margin:40px 0;
+}
+
+
+/* MAIN CONTAINER */
+.container{
+    max-width:1700px;
+    margin:auto;
+    background:#fff;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 35px rgba(0,0,0,0.08);
+}
+
+.header-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;   /* adds space below top buttons */
+}
+/* TOP HEADER */
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.logo-title{
+    font-size:42px;
+    font-weight:700;
+    color:#27ae60;
+}
+
+/* RIGHT TOP ITEMS */
+.right-section{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* SMALL USER CARD */
+.user-card{
+    background:linear-gradient(135deg,#27ae60,#1e8449);
+    padding:8px 14px;
+    border-radius:10px;
+    color:white;
+    text-align:center;
+    min-width:90px;
+}
+
+.welcome-text{
+    font-size:10px;
+}
+
+.username{
+    font-size:14px;
+    font-weight:600;
+}
+
+.menu-container{
+    position:relative;
+}
+
+/* BUTTONS */
+.logout-btn,
+.add-btn,
+.menu-btn{
+    border:none;
+    padding:13px 22px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:16px;
+    transition:.3s;
+}
+
+.logout-btn{
+    background:#e74c3c;
+    color:white;
+    text-decoration:none;
+}
+
+.logout-btn:hover{
+    background:#c0392b;
+}
+
+.add-btn{
+    background:#27ae60;
+    color:white;
+    margin-bottom:20px;
+}
+
+.add-btn:hover{
+    background:#1e8449;
+}
+
+.menu-btn{
+    background:#27ae60;
+    color:white;
+    font-size:22px;
+    width:50px;
+}
+
+.dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+    min-width:200px;
+    overflow:hidden;
+    z-index:100;
+    animation:fadeIn .3s ease;
+}
+
+.dropdown a{
+    display:block;
+    padding:14px 18px;
+    text-decoration:none;
+    color:#333;
+    font-weight:500;
+}
+
+.dropdown a:hover{
+    background:#eef7f1;
+}
+
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(-10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+/* TABLE */
+.table-wrapper{
+    overflow-x:auto;
+    margin-top:20px;
+    border-radius:14px;
+    border:1px solid #ddd;
+}
+
+table{
+    width:max-content;
+    min-width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#27ae60;
+    color:white;
+    padding:16px;
+    font-size:15px;
+}
+
+td{
+    padding:10px;
+    border:1px solid #eee;
+    text-align:center;
+}
+
+tr:hover{
+    background:#f7fff9;
+}
+
+/* INPUT */
+input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#27ae60;
+}
+
+/* SAVE BUTTON */
+.save-btn{
+    background:#3498db;
+    color:white;
+    padding:8px 14px;
+    border:none;
+    border-radius:8px;
+}
+</style>
+</head>
+<body>
+
+<!-- WATERMARK -->
+<div class="watermark">
+
+    {% for i in "12345678901234567890123456789012345678901234567890"|make_list %}
+        <p>
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+            {{ request.user.username }} {{ request.user.username }} {{ request.user.username }}
+        </p>
+    {% endfor %}
+
+</div>
+
+
+<div class="header-bar">
+
+    <button class="add-btn" onclick="addRow()">
+        + Add Row
+    </button>
+
+<div class="right-section">
+
+    <div class="user-card">
+        <div class="welcome-text">Welcome,</div>
+        <div class="username">{{ request.user.username }}</div>
+    </div>
+
+    <a href="{% url 'logout' %}" class="logout-btn">
+        Logout
+    </a>
+
+    <!-- 3 DOT MENU -->
+    <div class="menu-container">
+
+        <button class="menu-btn" onclick="toggleMenu()">
+            ⋮
+        </button>
+
+        <div class="dropdown" id="dropdownMenu">
+
+    {% if request.user.is_superuser %}
+
+        <a href="{% url 'all_data' %}">
+            📋 All Data
+        </a>
+
+        <a href="{% url 'admin_data' %}">
+            📊 Admin Data
+        </a>
+
+        <a href="{% url 'manage_users' %}">
+            👤 Manage Users
+        </a>
+
+    {% elif request.user.is_staff %}
+
+        <a href="{% url 'view_data' %}">
+            📄 My Data
+        </a>
+
+        <a href="{% url 'all_data' %}">
+            📋 All Data
+        </a>
+
+    {% else %}
+
+        <a href="{% url 'view_data' %}">
+            📄 My Data
+        </a>
+
+    {% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="table-wrapper">
+<table id="sheetTable">
+
+<tr>
+<th>SL</th>
+<th>GEM</th>
+<th>Date</th>
+<th>Place</th>
+<th>Officer</th>
+<th>Contact</th>
+<th>Marketing</th>
+<th>Item</th>
+<th>Rate</th>
+<th>GST</th>
+<th>Company</th>
+<th>Bill</th>
+<th>Bill Date</th>
+<th>Qty</th>
+<th>Price</th>
+<th>Amount</th>
+<th>FR</th>
+<th>FB</th>
+<th>TFR</th>
+<th>Order</th>
+<th>Action</th>
+</tr>
+
+</table>
+</div>
+
+<script>
+
+let rowCount = 0;
+let isSaving = false;
+let allowLeave = false;
+
+
+
+/* TOGGLE MENU */
+function toggleMenu(){
+
+    let menu = document.getElementById("dropdownMenu");
+
+    menu.style.display =
+    menu.style.display === "block" ? "none" : "block";
+
+}
+
+
+/* CLOSE MENU */
+window.onclick = function(e){
+
+    if(!e.target.closest('.menu-container')){
+        document.getElementById("dropdownMenu").style.display = "none";
+    }
+}
+
+
+/* ADD ROW */
+function addRow(){
+
+    rowCount++;
+
+    let table = document.getElementById("sheetTable");
+
+    let row = table.insertRow(-1);
+
+    row.id = "row"+rowCount;
+
+    row.innerHTML = `
+    <td>${rowCount}</td>
+    <td><input id="gem${rowCount}"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input type="date" id="date${rowCount}"></td>
+    <td><input id="place${rowCount}"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="officer${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="contact${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="marketing${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="item${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="rate${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="gst${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="company${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="bill${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input type="date" id="billdate${rowCount}"></td>
+    <td><input id="qty${rowCount}" onkeyup="calculate(${rowCount})"></td>
+    <td><input id="price${rowCount}" onkeyup="calculate(${rowCount})"></td>
+    <td><input id="amount${rowCount}" readonly></td>
+    <td><input id="fr${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="fb${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="tfr${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+    <td><input id="orderby${rowCount}"autocomplete="off" autocapitalize="off" spellcheck="false"></td>
+
+    <td>
+        <button class="save-btn" onclick="saveRow(${rowCount})">
+            Save
+        </button>
+
+        <span class="status-text" id="status${rowCount}"></span>
+    </td>
+    `;
+
+
+    /* AUTOSAVE TRIGGER */
+    let inputs = row.querySelectorAll("input");
+
+    inputs.forEach(input=>{
+
+        input.addEventListener("change",()=>{
+
+            autoSaveIfComplete(rowCount);
+
+        });
+
+    });
+
+    document.getElementById(`gem${rowCount}`).focus();
+
+}
+
+
+/* GET VALUE */
+function getVal(field,row){
+
+    return document.getElementById(field+row)?.value || "";
+
+}
+
+
+/* CALCULATE */
+function calculate(row){
+
+    let qty = parseFloat(getVal("qty",row)) || 0;
+    let price = parseFloat(getVal("price",row)) || 0;
+    let gst = parseFloat(getVal("gst",row)) || 0;
+
+    let total = qty * price;
+
+    let gstAmount = (total * gst)/100;
+
+    document.getElementById("amount"+row).value =
+    (total + gstAmount).toFixed(2);
+
+}
+
+
+/* CHECK ALL FILLED */
+function isComplete(row){
+
+    let fields = [
+        "gem","date","place","officer","contact","marketing",
+        "item","rate","gst","company","bill","billdate",
+        "qty","price","amount","fr","fb","tfr","orderby"
+    ];
+
+    for(let field of fields){
+
+        let input = document.getElementById(field+row);
+
+        if(!input.value.trim()){
+
+            return false;
+
+        }
+
+    }
+
+    return true;
+
+}
+
+
+/* AUTO SAVE */
+function autoSaveIfComplete(row){
+
+    if(isComplete(row)){
+
+        saveRow(row);
+
+    }
+
+}
+
+
+/* SAVE ROW */
+function saveRow(row){
+
+    if(isSaving) return;
+
+    if(!isComplete(row)){
+        alert("Please fill all fields.");
+        return;
+    }
+
+    isSaving = true;
+
+    let saveBtn = document.querySelector(`#row${row} .save-btn`);
+
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = "Saving...";
+
+    fetch("/autosave/",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+
+        body:JSON.stringify({
+
+            gem:getVal("gem",row),
+            date:getVal("date",row),
+            place:getVal("place",row),
+            officer:getVal("officer",row),
+            contact:getVal("contact",row),
+            marketing:getVal("marketing",row),
+            item:getVal("item",row),
+            rate:getVal("rate",row),
+            gst:getVal("gst",row),
+            company:getVal("company",row),
+            bill:getVal("bill",row),
+            billdate:getVal("billdate",row),
+            qty:getVal("qty",row),
+            price:getVal("price",row),
+            amount:getVal("amount",row),
+            fr:getVal("fr",row),
+            fb:getVal("fb",row),
+            tfr:getVal("tfr",row),
+            orderby:getVal("orderby",row)
+
+        })
+
+    })
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+    if(data.status==="success"){
+
+        saveBtn.innerHTML="Saved ✓";
+        saveBtn.style.background="green";
+
+            isSaving = false;
+
+            addRow();
+
+        }else{
+
+            alert(data.message || "Save failed");
+
+            saveBtn.disabled=false;
+            saveBtn.innerHTML="Save";
+
+            isSaving = false;
+        }
+
+    })
+
+    .catch(err=>{
+
+        console.log(err);
+
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = "Save";
+
+        isSaving = false;
+
+    });
+
+}
+/* INITIAL ROW */   
+addRow();
+
+/* KEY */
+document.addEventListener("keydown", function(e){
+
+    let active = document.activeElement;
+
+    if(active.tagName !== "INPUT") return;
+
+    let td = active.parentElement;
+    let tr = td.parentElement;
+
+    let rowIndex = tr.rowIndex;
+    let cellIndex = td.cellIndex;
+
+    if(e.key === "ArrowRight"){
+        e.preventDefault();
+        tr.cells[cellIndex+1]?.querySelector("input")?.focus();
+    }
+
+    if(e.key === "ArrowLeft"){
+        e.preventDefault();
+        tr.cells[cellIndex-1]?.querySelector("input")?.focus();
+    }
+
+    if(e.key === "ArrowDown"){
+        e.preventDefault();
+
+        let nextRow =
+        document.getElementById("sheetTable").rows[rowIndex+1];
+
+        nextRow?.cells[cellIndex]?.querySelector("input")?.focus();
+    }
+
+    if(e.key === "ArrowUp"){
+    e.preventDefault();
+
+    if(rowIndex > 1){
+        let prevRow = document.getElementById("sheetTable").rows[rowIndex-1];
+        prevRow?.cells[cellIndex]?.querySelector("input")?.focus();
+    }
+}
+
+});
+
+/* EXIT / BACK BUTTON LOGIC */
+history.pushState(null,null,location.href);
+
+window.addEventListener("beforeunload",function(e){
+
+    if(!allowLeave){
+        e.preventDefault();
+        e.returnValue="";
+    }
+
+});
+
+window.onpopstate=function(){
+
+    let confirmExit =
+    confirm("Do you want to logout and exit?");
+
+    if(confirmExit){
+
+        allowLeave=true;
+
+        window.location.href="{% url 'logout' %}";
+
+    }else{
+
+        history.pushState(null,null,location.href);
+
+    }
+
+};
+
+</script>
+</body>
+</html>
